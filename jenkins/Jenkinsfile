@@ -1,0 +1,33 @@
+pipeline {
+  agent any
+  triggers {
+    pollSCM('* * * * *')
+  }
+
+  stages {
+    stage('Build Docker Image') {
+      steps {
+        script {
+          dockerImage = docker.build("your-dockerhub-username/website-prt-org:latest")
+        }
+      }
+    }
+
+    stage('Push to DockerHub') {
+      steps {
+        withDockerRegistry([credentialsId: 'dockerhub-creds', url: '']) {
+          script {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
+      steps {
+        sh 'kubectl apply -f K8s-deployment.yaml'
+        sh 'kubectl apply -f K8s-service.yaml'
+      }
+    }
+  }
+}
