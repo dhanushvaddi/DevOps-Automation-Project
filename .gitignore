@@ -1,0 +1,22 @@
+# Ignore Ansible SSH keys
+*.pem
+
+# Terraform files
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Python cache (if any)
+__pycache__/
+*.pyc
+
+# VSCode or JetBrains project files
+.vscode/
+.idea/
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# Ignore sensitive Jenkins credentials (optional)
+secrets/
