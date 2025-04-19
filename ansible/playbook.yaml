@@ -1,0 +1,77 @@
+---
+- name: Install Jenkins on Jenkins Master
+  hosts: jenkins_master
+  become: true
+  tasks:
+    - name: Install Java 17
+      apt:
+        name:
+          - fontconfig
+          - openjdk-17-jre
+          - openjdk-17-jdk
+        state: present
+        update_cache: true
+
+    - name: Add Jenkins GPG Key
+      get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+
+    - name: Add Jenkins Repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: jenkins
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+        update_cache: yes
+
+    - name: Start Jenkins
+      service:
+        name: jenkins
+        state: started
+        enabled: true
+
+- name: Install Docker and Kubernetes on K8s Nodes
+  hosts: k8s_cluster
+  become: true
+  tasks:
+    - name: Download Docker install script
+      get_url:
+        url: https://raw.githubusercontent.com/lerndevops/labs/master/scripts/installDocker.sh
+        dest: /tmp/installDocker.sh
+        mode: '0755'
+
+    - name: Run Docker install script
+      shell: /tmp/installDocker.sh
+
+    - name: Restart Docker
+      systemd:
+        name: docker
+        state: restarted
+
+    - name: Install CRI-Docker
+      get_url:
+        url: https://raw.githubusercontent.com/lerndevops/labs/master/scripts/installCRIDockerd.sh
+        dest: /tmp/installCRIDockerd.sh
+        mode: '0755'
+
+    - name: Run CRI-Docker script
+      shell: /tmp/installCRIDockerd.sh
+
+    - name: Restart cri-docker
+      systemd:
+        name: cri-docker
+        state: restarted
+
+    - name: Install Kubernetes
+      get_url:
+        url: https://raw.githubusercontent.com/lerndevops/labs/master/scripts/installK8S.sh
+        dest: /tmp/installK8S.sh
+        mode: '0755'
+
+    - name: Run Kubernetes install script
+      shell: /tmp/installK8S.sh
