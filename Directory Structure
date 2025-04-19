@@ -1,0 +1,11 @@
+Website-PRT-ORG/
+├── ansible/
+│   ├── ansible_inventory.ini
+│   └── playbook.yaml
+├── terraform/
+│   └── main.tf
+├── Dockerfile
+├── Jenkinsfile
+├── K8s-deployment.yaml
+├── K8s-service.yaml
+└── README.md
